@@ -47,7 +47,7 @@ const Hero = () => {
     <div className="flex flex-col bg-white w-full">
       
       {/* Slider Images */}
-      <div className="relative h-[35vh] md:h-[50vh] lg:h-[65vh] w-full overflow-hidden bg-transparent">
+      <div className="relative aspect-[16/9] sm:h-[35vh] md:h-[50vh] lg:h-[65vh] w-full overflow-hidden bg-gray-50">
         {banners.map((img, index) => (
           <div 
             key={index}
@@ -56,7 +56,7 @@ const Hero = () => {
             <img 
               src={img} 
               alt={`Hero Banner ${index + 1}`} 
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-contain md:object-cover object-center"
             />
           </div>
         ))}

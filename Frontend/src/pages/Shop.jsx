@@ -126,7 +126,7 @@ const Shop = () => {
     <main className="shop-page bg-gray-50 min-h-screen pb-16">
       <ShopBanner />
       
-      <div className="max-w-7xl mx-auto px-5 md:px-12 pt-12">
+      <div className="max-w-7xl mx-auto px-1 sm:px-5 md:px-12 pt-8 md:pt-12">
         {/* Sidebar Drawer */}
         <ShopSidebar 
           isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)}
