@@ -1,0 +1,393 @@
+const express = require('express');
+const router = express.Router();
+const db = require('../config/db');
+const protect = require('../middleware/authMiddleware');
+const redis = require('../config/redis');
+
+// Helper to invalidate caches
+const invalidateCaches = async () => {
+  if (redis) {
+    try {
+      await redis.del('products:all');
+      await redis.del('products:top-selling');
+    } catch (err) {
+      console.error('Redis cache invalidation error:', err);
+    }
+  }
+};
+
+// @route   POST /api/products
+// @desc    Create a new product
+// @access  Private (Admin)
+router.post('/', protect, async (req, res) => {
+  const {
+    name,
+    description,
+    category_id,
+    original_price,
+    price,
+    unit,
+    main_image,
+    sub_images,
+    status
+  } = req.body;
+
+  try {
+    const query = `
+      INSERT INTO products (
+        name, description, category_id, original_price, price, unit, main_image, sub_images, status, moq
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      name,
+      description ? JSON.stringify(description) : null,
+      category_id || null,
+      original_price || null,
+      price,
+      unit ? JSON.stringify(unit) : null,
+      main_image || null,
+      sub_images ? JSON.stringify(sub_images) : null,
+      status || 'active',
+      req.body.moq ? parseInt(req.body.moq) : 1
+    ];
+
+    const [result] = await db.query(query, values);
+
+    await invalidateCaches();
+
+    res.status(201).json({
+      success: true,
+      data: {
+        id: result.insertId,
+        name,
+        category_id,
+        price
+      },
+      message: 'Product created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating product:', error);
+    require('fs').writeFileSync('debug_error.log', error.stack || error.toString());
+    res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+  }
+});
+
+// @route   PUT /api/products/bulk-update-offers
+// @desc    Bulk update product offers
+// @access  Private (Admin)
+router.put('/bulk-update-offers', protect, async (req, res) => {
+  try {
+    const { offers } = req.body;
+    if (!Array.isArray(offers)) {
+      return res.status(400).json({ success: false, message: 'Invalid data format' });
+    }
+
+    const connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    try {
+      for (const offer of offers) {
+        const { id, offer_price, offer_moq, is_offer_active, offer_start_date, offer_end_date } = offer;
+        
+        await connection.query(`
+          UPDATE products 
+          SET 
+            offer_price = ?, 
+            offer_moq = ?,
+            is_offer_active = ?, 
+            offer_start_date = ?, 
+            offer_end_date = ?
+          WHERE id = ?
+        `, [
+          offer_price || null,
+          offer_moq ? parseInt(offer_moq) : 1, 
+          is_offer_active ? 1 : 0, 
+          offer_start_date || null, 
+          offer_end_date || null, 
+          id
+        ]);
+      }
+      
+      await connection.commit();
+      connection.release();
+      
+      await invalidateCaches();
+      
+      res.json({ success: true, message: 'Offers updated successfully' });
+    } catch (error) {
+      await connection.rollback();
+      connection.release();
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error bulk updating offers:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
+// @route   PUT /api/products/top-selling
+// @desc    Update top selling products
+// @access  Private (Admin)
+router.put('/top-selling', protect, async (req, res) => {
+  try {
+    const { productIds } = req.body;
+    
+    if (!Array.isArray(productIds)) {
+      return res.status(400).json({ success: false, message: 'productIds must be an array' });
+    }
+
+    const connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    try {
+      // Reset all
+      await connection.query('UPDATE products SET is_top_selling = FALSE, top_selling_order = 0');
+      
+      // Update selected
+      if (productIds.length > 0) {
+        for (let i = 0; i < productIds.length; i++) {
+          await connection.query('UPDATE products SET is_top_selling = TRUE, top_selling_order = ? WHERE id = ?', [i, productIds[i]]);
+        }
+      }
+      
+      await connection.commit();
+      connection.release();
+      
+      await invalidateCaches();
+      
+      res.json({ success: true, message: 'Top selling products updated successfully' });
+    } catch (error) {
+      await connection.rollback();
+      connection.release();
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error updating top selling products:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
+// @route   PUT /api/products/bulk-status
+// @desc    Update status of multiple products
+// @access  Private (Admin)
+// IMPORTANT: This route must be placed before /:id to prevent express from matching "bulk-status" as an ID
+router.put('/bulk-status', protect, async (req, res) => {
+  const { ids, status } = req.body;
+  
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ success: false, message: 'Invalid product IDs' });
+  }
+
+  if (!['active', 'inactive'].includes(status)) {
+    return res.status(400).json({ success: false, message: 'Invalid status' });
+  }
+
+  try {
+    const placeholders = ids.map(() => '?').join(',');
+    const query = `UPDATE products SET status = ? WHERE id IN (${placeholders})`;
+    const values = [status, ...ids];
+    
+    await db.query(query, values);
+    
+    await invalidateCaches();
+    
+    res.json({ success: true, message: `Products marked as ${status}` });
+  } catch (error) {
+    console.error('Error updating product statuses:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
+// @route   PUT /api/products/:id
+// @desc    Update an existing product
+// @access  Private (Admin)
+router.put('/:id', protect, async (req, res) => {
+  const { id } = req.params;
+  const {
+    name,
+    description,
+    category_id,
+    original_price,
+    price,
+    unit,
+    main_image,
+    sub_images,
+    status
+  } = req.body;
+
+  try {
+    const query = `
+      UPDATE products SET 
+        name = ?, description = ?, category_id = ?, original_price = ?, price = ?, 
+        unit = ?, main_image = ?, sub_images = ?, status = ?, moq = ?
+      WHERE id = ?
+    `;
+
+    const values = [
+      name,
+      description ? JSON.stringify(description) : null,
+      category_id || null,
+      original_price || null,
+      price,
+      unit ? JSON.stringify(unit) : null,
+      main_image || null,
+      sub_images ? JSON.stringify(sub_images) : null,
+      status || 'active',
+      req.body.moq ? parseInt(req.body.moq) : 1,
+      id
+    ];
+
+    const [result] = await db.query(query, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    await invalidateCaches();
+
+    res.json({ success: true, message: 'Product updated successfully' });
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
+// @route   GET /api/products
+// @desc    Get all products
+// @access  Public
+router.get('/', async (req, res) => {
+  try {
+    if (redis) {
+      try {
+        const cachedProducts = await redis.get('products:all');
+        if (cachedProducts) {
+          return res.json({ success: true, data: cachedProducts });
+        }
+      } catch (err) {
+        console.error('Redis cache error:', err);
+      }
+    }
+
+    const [rows] = await db.query(`
+      SELECT p.*, c.name as category_name 
+      FROM products p 
+      LEFT JOIN categories c ON p.category_id = c.id
+      ORDER BY p.created_at DESC
+    `);
+    
+    if (redis) {
+      await redis.set('products:all', rows);
+    }
+    
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
+// @route   GET /api/products/top-selling
+// @desc    Get top selling products
+// @access  Public
+router.get('/top-selling', async (req, res) => {
+  try {
+    if (redis) {
+      try {
+        const cachedTopSelling = await redis.get('products:top-selling');
+        if (cachedTopSelling) {
+          return res.json({ success: true, data: cachedTopSelling });
+        }
+      } catch (err) {
+        console.error('Redis cache error:', err);
+      }
+    }
+
+    const [rows] = await db.query(`
+      SELECT p.*, c.name as category_name 
+      FROM products p 
+      LEFT JOIN categories c ON p.category_id = c.id
+      WHERE p.is_top_selling = TRUE
+      ORDER BY p.top_selling_order ASC
+    `);
+    
+    if (redis) {
+      await redis.set('products:top-selling', rows);
+    }
+    
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    console.error('Error fetching top selling products:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
+// @route   GET /api/products/:id
+// @desc    Get product by ID
+// @access  Public
+router.get('/:id', async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT p.*, c.name as category_name 
+      FROM products p 
+      LEFT JOIN categories c ON p.category_id = c.id
+      WHERE p.id = ?
+    `, [req.params.id]);
+    
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+    
+    res.json({ success: true, data: rows[0] });
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
+// @route   DELETE /api/products/bulk
+// @desc    Delete multiple products
+// @access  Private (Admin)
+router.delete('/bulk', protect, async (req, res) => {
+  const { ids } = req.body;
+  
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ success: false, message: 'Invalid product IDs' });
+  }
+
+  try {
+    const placeholders = ids.map(() => '?').join(',');
+    const query = `DELETE FROM products WHERE id IN (${placeholders})`;
+    
+    await db.query(query, ids);
+    
+    await invalidateCaches();
+    
+    res.json({ success: true, message: 'Products deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting products:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
+// @route   DELETE /api/products/:id
+// @desc    Delete product by ID
+// @access  Private (Admin)
+router.delete('/:id', protect, async (req, res) => {
+  try {
+    const [result] = await db.query('DELETE FROM products WHERE id = ?', [req.params.id]);
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+    
+    await invalidateCaches();
+    
+    res.json({ success: true, message: 'Product deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
+module.exports = router;
