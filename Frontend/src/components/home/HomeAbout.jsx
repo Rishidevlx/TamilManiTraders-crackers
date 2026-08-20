@@ -6,7 +6,7 @@ const HomeAbout = () => {
       
       {/* Left Image - Absolutely positioned to the left edge */}
       <img 
-        src="public\Banner\Home page left bg.png" 
+        src="/Banner/Home page left bg.png" 
         alt="Left Decorative" 
         className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-[20%] xl:w-[25%] h-auto object-contain drop-shadow-md" 
       />
