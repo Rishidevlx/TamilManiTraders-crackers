@@ -14,7 +14,7 @@ const Home = () => {
         title="Sivakasi Crackers | Tamilmani Traders - Buy Fireworks Online"
         description="Buy premium quality Sivakasi crackers online at genuine wholesale prices from Tamil Mani Traders. Get safe delivery, exclusive combo offers, and eco-friendly green crackers."
         keywords="sivakasi crackers, buy crackers online, best crackers shop in sivakasi, tamil mani traders, wholesale crackers, diwali firecrackers"
-        url="https://tamilmanitraders.com/"
+        url="https://tamilmanitraders.in/"
         structuredData={{
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
@@ -29,7 +29,7 @@ const Home = () => {
             "addressCountry": "IN"
           },
           "telephone": "+919994703605",
-          "url": "https://tamilmanitraders.com",
+          "url": "https://tamilmanitraders.in",
           "areaServed": [
             "Sivakasi",
             "Tamil Nadu",
