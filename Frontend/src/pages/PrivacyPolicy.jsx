@@ -1,10 +1,31 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import SEO from '../components/seo/SEO';
 
 const PrivacyPolicy = () => {
+  const [contactDetails, setContactDetails] = useState({
+    address: 'S.No. 456/2C1B, D.No. 2/266, ALANGULAM, Vembakottai (Tk), Virudhunagar (Dt)',
+    phone: '93639 53616',
+    email: 'hari953616@gmail.com'
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // Fetch dynamic contact details from CMS
+    fetch(import.meta.env.VITE_API_URL + '/api/cms/home')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data.contact_details) {
+          setContactDetails(data.data.contact_details);
+        }
+      })
+      .catch(err => console.error('Error fetching contact details:', err));
   }, []);
+
+  // Format address for display
+  const formattedAddress = contactDetails.address.split('\n').map((line, i) => (
+    <span key={i}>{line}<br /></span>
+  ));
 
   return (
     <div className="font-body text-black bg-white min-h-screen pt-24 pb-16">
@@ -75,9 +96,9 @@ const PrivacyPolicy = () => {
             <p>If you have any questions or concerns about this Privacy Policy, please contact us at:</p>
             <ul className="mt-3 space-y-1 font-medium text-gray-800">
               <li>Tamil Mani Traders</li>
-              <li>S.No. 456/2C1B, D.No. 2/266, ALANGULAM, Vembakottai (Tk), Virudhunagar (Dt)</li>
-              <li>Phone: +91 93639 53616</li>
-              <li>Email: hari953616@gmail.com</li>
+              <li>{formattedAddress}</li>
+              <li>Phone: +91 {contactDetails.phone}</li>
+              <li>Email: {contactDetails.email}</li>
             </ul>
           </section>
 
