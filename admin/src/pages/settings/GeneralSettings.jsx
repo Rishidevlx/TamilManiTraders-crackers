@@ -7,7 +7,8 @@ const GeneralSettings = () => {
     logo_url: '',
     favicon_url: '',
     pricelist_url: '',
-    currency_symbol: '₹'
+    currency_symbol: '₹',
+    gst_number: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -71,7 +72,8 @@ const GeneralSettings = () => {
           logo_url: data.data.general_settings.logo_url || '',
           favicon_url: data.data.general_settings.favicon_url || '',
           pricelist_url: data.data.general_settings.pricelist_url || '',
-          currency_symbol: data.data.general_settings.currency_symbol || '₹'
+          currency_symbol: data.data.general_settings.currency_symbol || '₹',
+          gst_number: data.data.general_settings.gst_number || ''
         });
       }
     } catch (error) {
@@ -210,15 +212,27 @@ const GeneralSettings = () => {
           </div>
           
           <div className="p-6">
-            <div className="max-w-sm">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Currency Symbol</label>
-              <input 
-                type="text" 
-                value={settings.currency_symbol}
-                onChange={(e) => setSettings({...settings, currency_symbol: e.target.value})}
-                placeholder="e.g. ₹ or $"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-xl font-bold"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="max-w-sm">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Currency Symbol</label>
+                <input 
+                  type="text" 
+                  value={settings.currency_symbol}
+                  onChange={(e) => setSettings({...settings, currency_symbol: e.target.value})}
+                  placeholder="e.g. ₹ or $"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-xl font-bold"
+                />
+              </div>
+              <div className="max-w-sm">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">GST Number</label>
+                <input 
+                  type="text" 
+                  value={settings.gst_number || ''}
+                  onChange={(e) => setSettings({...settings, gst_number: e.target.value})}
+                  placeholder="e.g. 33AAAAA0000A1Z5"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all font-semibold uppercase"
+                />
+              </div>
             </div>
           </div>
         </div>

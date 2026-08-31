@@ -33,6 +33,32 @@ router.post('/whatsapp', async (req, res) => {
     if (city) full_address += `, ${city}`;
     if (pincode) full_address += ` - ${pincode}`;
     
+    // Fetch Settings & Contact Details from CMS
+    let gst_number = '';
+    let logo_url = '';
+    let contact_details = {};
+    
+    const [cmsRows] = await connection.query("SELECT cms_key, cms_value FROM home_cms WHERE cms_key IN ('general_settings', 'contact_details')");
+    
+    cmsRows.forEach(row => {
+      if (row.cms_key === 'general_settings' && row.cms_value) {
+        try {
+          const settings = typeof row.cms_value === 'string' ? JSON.parse(row.cms_value) : row.cms_value;
+          gst_number = settings.gst_number || '';
+          logo_url = settings.logo_url || '';
+        } catch (e) {
+          console.error('Error parsing general_settings', e);
+        }
+      }
+      if (row.cms_key === 'contact_details' && row.cms_value) {
+        try {
+          contact_details = typeof row.cms_value === 'string' ? JSON.parse(row.cms_value) : row.cms_value;
+        } catch (e) {
+          console.error('Error parsing contact_details', e);
+        }
+      }
+    });
+
     // Prepare data for invoice
     const enquiryData = {
       enquiry_no,
@@ -41,7 +67,10 @@ router.post('/whatsapp', async (req, res) => {
       address,
       city,
       pincode,
-      cart_data
+      cart_data,
+      gst_number,
+      logo_url,
+      contact_details
     };
 
     // Generate Invoice PDF & Upload to Cloudinary

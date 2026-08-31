@@ -5,7 +5,7 @@ import logo from '../../assets/logo-removebg-preview.png';
 
 const Footer = () => {
   const [contactDetails, setContactDetails] = useState({
-    address: '138, Srivilliputhur Street',
+    address: 'S.No. 456/2C1B, D.No. 2/266, ALANGULAM, Vembakottai (Tk), Virudhunagar (Dt)',
     phone: '93639 53616',
     email: 'hari953616@gmail.com'
   });
@@ -141,8 +141,18 @@ const Footer = () => {
         </div>
       </div>
       
+      {/* Local & GEO SEO Content */}
+      <div className="max-w-7xl mx-auto mt-12 text-center text-xs text-gray-700 max-w-4xl opacity-80 leading-relaxed">
+        <p className="mb-2">
+          <strong>Tamilmani Traders Sivakasi</strong> is a top-rated <strong>fireworks supplier in Sivakasi</strong> and a trusted name in the <strong>Sivakasi business directory</strong>. As one of the leading <strong>wholesale traders in Sivakasi</strong>, we provide high-quality diwali crackers, combo packs, and sparklers across India. Buy directly from the <strong>Sivakasi wholesale market</strong> online and enjoy safe delivery from the most reliable <strong>fireworks manufacturer Sivakasi</strong>.
+        </p>
+        <p>
+          <strong>Our Delivery Network (All India):</strong> We safely deliver premium Sivakasi crackers to all major states and cities including <strong>Tamil Nadu</strong> (Chennai, Coimbatore, Madurai, Trichy), <strong>Kerala</strong>, <strong>Karnataka</strong> (Bangalore), <strong>Andhra Pradesh</strong>, <strong>Telangana</strong> (Hyderabad), and across <strong>North India</strong> (Delhi, Mumbai, Gujarat, UP).
+        </p>
+      </div>
+
       {/* Bottom Footer Info */}
-      <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-black/20 flex flex-col md:flex-row items-center justify-between text-xs text-gray-800 font-medium">
+      <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-black/20 flex flex-col md:flex-row items-center justify-between text-xs text-gray-800 font-medium">
         <p>&copy; {new Date().getFullYear()} Tamil Mani Traders. All Rights Reserved.</p>
         <p className="mt-2 md:mt-0">{inlineAddress} | {contactDetails.phone} | {contactDetails.email}</p>
       </div>

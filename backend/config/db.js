@@ -37,7 +37,7 @@ const initDB = async () => {
 
     // Verify main connection and create tables
     const connection = await pool.getConnection();
-    
+
     // Create home_cms table
     await connection.query(`
       CREATE TABLE IF NOT EXISTS home_cms (

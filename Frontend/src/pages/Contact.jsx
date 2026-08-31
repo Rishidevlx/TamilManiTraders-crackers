@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import SEO from '../components/seo/SEO';
 import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaClock } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 const Contact = () => {
   const [contactDetails, setContactDetails] = useState({
-    address: '138, Srivilliputhur Street, Sivakasi, Tamil Nadu',
+    address: 'S.No. 456/2C1B, D.No. 2/266, ALANGULAM, Vembakottai (Tk), Virudhunagar (Dt)',
     phone: '+91 93639 53616',
     email: 'hari953616@gmail.com',
     working_hours: 'Monday to Sunday: 9:00 AM - 9:00 PM',
@@ -24,6 +25,12 @@ const Contact = () => {
 
   return (
     <div className="font-body text-black min-h-screen bg-primary">
+      <SEO 
+        title="Contact Us | Tamil Mani Traders Sivakasi"
+        description="Get in touch with Tamil Mani Traders for wholesale crackers orders, enquiries, and bulk bookings. Visit our shop in Sivakasi or contact us online."
+        keywords="contact tamil mani traders, crackers shop phone number, sivakasi fireworks contact, buy crackers wholesale contact"
+        url="https://tamilmanitraders.com/contact"
+      />
       
       {/* 1. Banner Section */}
       <section 
@@ -99,7 +106,7 @@ const Contact = () => {
               <div className="flex items-start gap-4">
                 <div className="text-brand text-xl mt-1"><FaMapMarkerAlt /></div>
                 <div>
-                  <h4 className="font-bold text-gray-800 mb-1">Address :</h4>
+                  <h4 className="font-bold text-gray-800 mb-1">Tamil Mani Traders Address :</h4>
                   <p className="text-gray-600 whitespace-pre-line">{contactDetails.address}</p>
                 </div>
               </div>
@@ -107,7 +114,7 @@ const Contact = () => {
               <div className="flex items-start gap-4">
                 <div className="text-brand text-xl mt-1"><FaPhoneAlt /></div>
                 <div>
-                  <h4 className="font-bold text-gray-800 mb-1">Customer Service Number :</h4>
+                  <h4 className="font-bold text-gray-800 mb-1">Tamil Mani Traders Contact Number :</h4>
                   <p className="text-gray-600">{contactDetails.phone}</p>
                 </div>
               </div>

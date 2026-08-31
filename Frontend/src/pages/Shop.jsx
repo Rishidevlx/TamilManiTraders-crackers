@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SEO from '../components/seo/SEO';
 import ShopBanner from '../components/shop/ShopBanner';
 import ShopSidebar from '../components/shop/ShopSidebar';
 import ShopTopBar from '../components/shop/ShopTopBar';
@@ -15,7 +16,7 @@ const Shop = () => {
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOption, setSortOption] = useState('default');
-  const [viewMode, setViewMode] = useState('list');
+  const [viewMode, setViewMode] = useState('grid');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
@@ -124,6 +125,12 @@ const Shop = () => {
 
   return (
     <main className="shop-page bg-gray-50 min-h-screen pb-16">
+      <SEO 
+        title="Shop Sivakasi Crackers | Tamil Mani Traders"
+        description="Browse our wide collection of premium Sivakasi crackers. Get the best wholesale prices on sparklers, atom bombs, flower pots, and family combo packs."
+        keywords="sivakasi crackers price list, buy crackers online, wholesale fireworks, crackers shop, tamil mani traders shop"
+        url="https://tamilmanitraders.com/shop"
+      />
       <ShopBanner />
       
       <div className="max-w-7xl mx-auto px-1 sm:px-5 md:px-12 pt-8 md:pt-12">
@@ -155,8 +162,8 @@ const Shop = () => {
             <ProductTable products={sortedProducts} />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sortedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).length > 0 ? (
-                sortedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product) => (
+              {sortedProducts.length > 0 ? (
+                sortedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} viewMode={viewMode} />
                 ))
               ) : (
@@ -167,13 +174,6 @@ const Shop = () => {
             </div>
           )}
 
-          {sortedProducts.length > 0 && viewMode === 'grid' && (
-            <Pagination 
-              currentPage={currentPage} 
-              totalPages={totalPages} 
-              onPageChange={setCurrentPage} 
-            />
-          )}
         </div>
       </div>
     </main>

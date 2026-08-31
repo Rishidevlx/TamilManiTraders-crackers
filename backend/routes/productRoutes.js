@@ -3,6 +3,8 @@ const router = express.Router();
 const db = require('../config/db');
 const protect = require('../middleware/authMiddleware');
 const redis = require('../config/redis');
+const PDFDocument = require('pdfkit-table');
+const https = require('https');
 
 // Helper to invalidate caches
 const invalidateCaches = async () => {
@@ -10,6 +12,7 @@ const invalidateCaches = async () => {
     try {
       await redis.del('products:all');
       await redis.del('products:top-selling');
+      await redis.del('pricelist:pdf');
     } catch (err) {
       console.error('Redis cache invalidation error:', err);
     }
@@ -253,6 +256,204 @@ router.put('/:id', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/products/pricelist/download
+// @desc    Download dynamic PDF pricelist
+// @access  Public
+router.get('/pricelist/download', async (req, res) => {
+  try {
+    let frontendUrl = process.env.FRONTEND_URL || 'https://tamilmanitraders.in';
+    if (req.headers.origin) {
+      frontendUrl = req.headers.origin;
+    } else if (req.headers.referer) {
+      try {
+        frontendUrl = new URL(req.headers.referer).origin;
+      } catch (e) {}
+    }
+
+    const fetchImageBufferSafe = (url) => {
+      return new Promise((resolve) => {
+        if (!url) return resolve(null);
+        const client = url.startsWith('https') ? require('https') : require('http');
+        client.get(url, (res) => {
+          if (res.statusCode !== 200) return resolve(null);
+          const data = [];
+          res.on('data', (chunk) => data.push(chunk));
+          res.on('end', () => resolve(Buffer.concat(data)));
+        }).on('error', () => resolve(null));
+      });
+    };
+
+    // 2. Fetch all active products
+    const [products] = await db.query(`
+      SELECT p.*, c.name as category_name 
+      FROM products p 
+      LEFT JOIN categories c ON p.category_id = c.id
+      WHERE p.status = 'active'
+      ORDER BY c.name ASC, p.name ASC
+    `);
+
+    // Fetch logo and banner
+    let logoBuffer = null;
+    let bannerBuffer = null;
+    try {
+      const [cmsRows] = await db.query(`SELECT cms_key, cms_value FROM home_cms`);
+      const cmsData = {};
+      cmsRows.forEach(row => {
+        try {
+          cmsData[row.cms_key] = JSON.parse(row.cms_value);
+        } catch(e) {
+          cmsData[row.cms_key] = row.cms_value;
+        }
+      });
+
+      const logoUrl = cmsData.general_settings?.logo_url;
+      if (logoUrl) {
+        logoBuffer = await fetchImageBufferSafe(logoUrl.replace('f_auto', 'f_jpg').replace('.webp', '.jpg'));
+      }
+      
+      const banners = cmsData.hero_banners;
+      if (banners && banners.length > 0) {
+         bannerBuffer = await fetchImageBufferSafe(banners[0].replace('f_auto', 'f_jpg').replace('.webp', '.jpg'));
+      }
+    } catch (err) {
+      console.error('Error fetching CMS images:', err);
+    }
+
+    // 3. Generate PDF
+    const doc = new PDFDocument({ margin: 30, size: 'A4', bufferPages: true });
+    const buffers = [];
+    doc.on('data', buffers.push.bind(buffers));
+
+    // Draw Top Banner & Logo
+    if (logoBuffer) {
+       try {
+         doc.image(logoBuffer, { fit: [100, 100], align: 'center' });
+         doc.moveDown(1);
+       } catch (e) {
+         console.error('Error drawing logo:', e);
+         logoBuffer = null; // disable watermark if format is bad
+       }
+    }
+    
+    doc.fontSize(24).font('Helvetica-Bold').fillColor('#EAB308').text('TAMIL MANI TRADERS', { align: 'center' });
+    doc.fontSize(14).font('Helvetica-Bold').fillColor('#000000').text('OFFICIAL PRICELIST', { align: 'center' });
+    doc.moveDown(2);
+
+    if (bannerBuffer) {
+       try {
+         doc.image(bannerBuffer, { width: doc.page.width - 60, align: 'center' });
+         doc.moveDown(3);
+       } catch (e) {
+         console.error('Error drawing banner:', e);
+       }
+    }
+
+    // Group products by category
+    const categories = {};
+    products.forEach(p => {
+       const cat = p.category_name || 'Uncategorized';
+       if (!categories[cat]) categories[cat] = [];
+       categories[cat].push(p);
+    });
+
+    let globalSno = 1;
+
+    for (const [categoryName, catProducts] of Object.entries(categories)) {
+       doc.moveDown(1);
+       doc.font('Helvetica-Bold').fontSize(14).fillColor('#000000').text(categoryName);
+       doc.moveDown(0.5);
+
+       const tableData = catProducts.map((p) => {
+          const orig = p.original_price ? parseFloat(p.original_price) : 0;
+          const curr = parseFloat(p.price);
+          
+          let parsedUnit = 'packet';
+          if (p.unit) {
+            try {
+              const u = JSON.parse(p.unit);
+              if (Array.isArray(u) && u.length > 0) parsedUnit = u[0];
+              else if (typeof u === 'string') parsedUnit = u;
+            } catch (e) {
+              parsedUnit = p.unit;
+            }
+          }
+
+          return [
+             (globalSno++).toString(),
+             p.name,
+             parsedUnit,
+             orig > 0 ? `Rs. ${orig.toFixed(2)}` : '-',
+             `Rs. ${curr.toFixed(2)}`
+          ];
+       });
+
+       const table = {
+         headers: [
+           { label: 'S.No', width: 40, headerColor: '#FFF533', headerOpacity: 1 },
+           { label: 'Product Name', width: 230, headerColor: '#FFF533', headerOpacity: 1 },
+           { label: 'Unit', width: 70, headerColor: '#FFF533', headerOpacity: 1 },
+           { label: 'Original Price', width: 95, headerColor: '#FFF533', headerOpacity: 1 },
+           { label: 'Discount Price', width: 95, headerColor: '#FFF533', headerOpacity: 1 }
+         ],
+         rows: tableData
+       };
+
+       await doc.table(table, {
+         prepareHeader: () => doc.font('Helvetica-Bold').fontSize(10).fillColor('#000000'),
+         prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+           doc.font('Helvetica-Bold').fontSize(9).fillColor('#000000');
+           
+           if (indexColumn === 1) {
+             const prod = catProducts[indexRow];
+              if (prod) {
+                const slugify = (text) => text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
+                const productLink = `${frontendUrl}/product/${slugify(prod.name)}`;
+                doc.link(rectCell.x, rectCell.y, rectCell.width, rectCell.height, productLink);
+                // Add a subtle color to indicate it's a link
+               doc.fillColor('#0066cc'); 
+             }
+           }
+           
+           // Draw vertical borders
+           doc.lineWidth(0.5).strokeColor('#dddddd');
+           doc.moveTo(rectCell.x + rectCell.width, rectCell.y).lineTo(rectCell.x + rectCell.width, rectCell.y + rectCell.height).stroke();
+           if (indexColumn === 0) {
+              doc.moveTo(rectCell.x, rectCell.y).lineTo(rectCell.x, rectCell.y + rectCell.height).stroke();
+           }
+         },
+         padding: 5
+       });
+    }
+
+    // Add watermark to all pages
+    const pages = doc.bufferedPageRange();
+    for (let i = 0; i < pages.count; i++) {
+      doc.switchToPage(i);
+      if (logoBuffer) {
+        doc.save();
+        doc.opacity(0.1);
+        try {
+          doc.image(logoBuffer, (doc.page.width - 300) / 2, (doc.page.height - 300) / 2, { width: 300 });
+        } catch (e) {}
+        doc.restore();
+      }
+    }
+    
+    doc.end();
+
+    doc.on('end', async () => {
+      const pdfData = Buffer.concat(buffers);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="Tamil_Mani_Traders_Pricelist.pdf"');
+      res.send(pdfData);
+    });
+
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
 // @route   GET /api/products
 // @desc    Get all products
 // @access  Public
@@ -322,23 +523,48 @@ router.get('/top-selling', async (req, res) => {
   }
 });
 
-// @route   GET /api/products/:id
-// @desc    Get product by ID
+// @route   GET /api/products/:idOrSlug
+// @desc    Get product by ID or Slug
 // @access  Public
-router.get('/:id', async (req, res) => {
+router.get('/:idOrSlug', async (req, res) => {
   try {
-    const [rows] = await db.query(`
-      SELECT p.*, c.name as category_name 
-      FROM products p 
-      LEFT JOIN categories c ON p.category_id = c.id
-      WHERE p.id = ?
-    `, [req.params.id]);
+    const param = req.params.idOrSlug;
     
-    if (rows.length === 0) {
+    const slugify = (text) => {
+      return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+    };
+
+    let product = null;
+
+    if (!isNaN(param)) {
+      const [rows] = await db.query(`
+        SELECT p.*, c.name as category_name 
+        FROM products p 
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE p.id = ?
+      `, [param]);
+      if (rows.length > 0) product = rows[0];
+    }
+    
+    if (!product) {
+      const [allRows] = await db.query(`
+        SELECT p.*, c.name as category_name 
+        FROM products p 
+        LEFT JOIN categories c ON p.category_id = c.id
+      `);
+      product = allRows.find(p => slugify(p.name) === param);
+    }
+    
+    if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
     
-    res.json({ success: true, data: rows[0] });
+    res.json({ success: true, data: product });
   } catch (error) {
     console.error('Error fetching product:', error);
     res.status(500).json({ success: false, message: 'Server Error' });

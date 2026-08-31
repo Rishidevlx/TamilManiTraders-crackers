@@ -1,10 +1,18 @@
 import React from 'react';
+import SEO from '../components/seo/SEO';
 import { FaPhoneAlt, FaBoxOpen, FaPercent, FaHandshake, FaQuoteLeft, FaStar } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import FAQ from '../components/about/FAQ';
 
 const About = () => {
   return (
     <div className="font-body text-black bg-primary min-h-screen">
+      <SEO 
+        title="About Us | Tamil Mani Traders - Sivakasi Crackers"
+        description="Learn about Tamil Mani Traders, the most trusted crackers shop in Sivakasi since 2000. Discover our core values, safe packaging, and commitment to quality fireworks."
+        keywords="about tamil mani traders, crackers shop in sivakasi, sivakasi fireworks company, online crackers shopping sivakasi, subhas chandra bose sivakasi"
+        url="https://tamilmanitraders.com/about"
+      />
       
       {/* 1. Banner Section */}
       <section 
@@ -39,13 +47,10 @@ const About = () => {
               Online Crackers Shopping Sivakasi
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Welcome to <strong>Tamil Mani Traders</strong>, your premier destination for high-quality fireworks since 2020. 
-              We are a leading crackers online shopping platform located in the heart of Sivakasi, offering an extensive collection 
-              of sparklers, flower pots, rockets, fancy crackers, and multi-shot aerials.
+              Founded in 2020, <strong>Tamil Mani Traders</strong> has been serving the Sivakasi community and fireworks lovers for over 5+ years. Located in the heart of the fireworks capital, we specialize as a leading <strong>fireworks supplier in Sivakasi</strong> for wholesale fireworks and online crackers shopping.
             </p>
             <p className="text-gray-700 leading-relaxed mb-6">
-              All our crackers are sourced directly from top manufacturers to ensure a smooth and enjoyable online crackers shopping experience. 
-              With our user-friendly site and fast delivery service, we strive to make your celebrations brighter and more memorable.
+              Our mission is to provide premium quality products sourced directly from top <strong>fireworks manufacturer Sivakasi</strong> units, with excellent customer service and unbeatable wholesale prices. As one of the <strong>best traders in Sivakasi</strong>, we have built lasting trust with thousands of happy customers across the <strong>Sivakasi wholesale market</strong> and South India, ensuring every Diwali is safe, spectacular, and memorable.
             </p>
             <div className="flex gap-4">
               <Link to="/shop" className="bg-brand text-white px-8 py-3 rounded-full font-heading uppercase text-lg hover:bg-footer transition-colors shadow-lg">
@@ -170,6 +175,9 @@ const About = () => {
           </div>
         </div>
       </section>
+
+      {/* FAQ Section for AEO */}
+      <FAQ />
 
       {/* 5. Testimonials Section */}
       <section className="py-16 bg-primary">

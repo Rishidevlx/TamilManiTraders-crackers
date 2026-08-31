@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SEO from '../components/seo/SEO';
 import ShopBanner from '../components/shop/ShopBanner';
 import ShopSidebar from '../components/shop/ShopSidebar';
 import ShopTopBar from '../components/shop/ShopTopBar';
@@ -98,6 +99,12 @@ const Offers = () => {
 
   return (
     <main className="offers-page bg-gray-50 min-h-screen pb-16">
+      <SEO 
+        title="Exclusive Diwali Crackers Offers | Tamil Mani Traders"
+        description="Grab the best deals and combo offers on Sivakasi crackers. Special discounts on bulk orders and family packs for a grand Diwali celebration."
+        keywords="crackers combo offers, diwali crackers discount, sivakasi crackers offers, cheap crackers online, buy fireworks combo"
+        url="https://tamilmanitraders.com/offers"
+      />
       <ShopBanner />
       
       <div className="max-w-7xl mx-auto px-5 md:px-12 pt-12 flex flex-col lg:flex-row">

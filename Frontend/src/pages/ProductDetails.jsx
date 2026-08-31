@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import SEO from '../components/seo/SEO';
 import { FiShoppingCart, FiHeart, FiMinus, FiPlus } from 'react-icons/fi';
 import { FaWhatsapp, FaHeart } from 'react-icons/fa';
 import ProductCard from '../components/product/ProductCard';
@@ -112,6 +113,36 @@ const ProductDetails = () => {
 
   return (
     <main className="bg-white min-h-screen pb-16 pt-32 font-body">
+      <SEO 
+        title={`${product.name} | Buy Online at Tamil Mani Traders`}
+        description={product.description[0] || `Buy ${product.name} online at wholesale prices from Tamil Mani Traders. Premium Sivakasi crackers with safe delivery.`}
+        keywords={`${product.name}, ${product.category}, buy ${product.name}, sivakasi crackers online, fireworks`}
+        url={`https://tamilmanitraders.com/product/${id}`}
+        image={product.image}
+        type="product"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": product.name,
+          "image": product.image,
+          "description": product.description[0] || `Buy ${product.name} online`,
+          "brand": {
+            "@type": "Brand",
+            "name": "Tamil Mani Traders"
+          },
+          "offers": {
+            "@type": "Offer",
+            "url": `https://tamilmanitraders.com/product/${id}`,
+            "priceCurrency": "INR",
+            "price": product.price,
+            "availability": "https://schema.org/InStock",
+            "seller": {
+              "@type": "Organization",
+              "name": "Tamil Mani Traders"
+            }
+          }
+        }}
+      />
       <div className="max-w-7xl mx-auto px-5 md:px-12">
         
         {/* Breadcrumbs */}

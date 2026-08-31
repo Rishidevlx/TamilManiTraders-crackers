@@ -82,11 +82,11 @@ const Hero = () => {
           Premium Quality Crackers
         </span>
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-extrabold mb-4 leading-tight text-gray-900 uppercase">
-          CELEBRATE WITH <br className="md:hidden" /> <span className="text-brand">TAMIL MANI TRADERS</span>
+          <span className="text-brand">TAMILMANI TRADERS</span> <br className="md:hidden" /> SIVAKASI CRACKERS
         </h1>
         <p className="text-gray-600 mb-8 max-w-2xl text-sm md:text-lg">
-          Light up your celebrations with Sivakasi's finest standard fireworks. 
-          Direct from factory to your doorstep with amazing discounts.
+          Buy authentic Sivakasi Crackers directly from Tamilmani Traders. 
+          Light up your celebrations with Sivakasi's finest standard fireworks at genuine wholesale prices.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link 
@@ -95,12 +95,14 @@ const Hero = () => {
           >
             Shop Now <FiArrowRight />
           </Link>
-          <Link 
-            to="/about" 
+          <a 
+            href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/products/pricelist/download`} 
+            target="_blank" 
+            rel="noopener noreferrer"
             className="bg-white border-2 border-brand text-brand hover:bg-brand hover:text-white font-bold py-3 md:py-4 px-8 md:px-10 rounded-full shadow-lg transition-all transform hover:-translate-y-1 uppercase tracking-wider text-sm md:text-base"
           >
             Download Pricelist
-          </Link>
+          </a>
         </div>
       </div>
 

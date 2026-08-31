@@ -17,9 +17,25 @@ const HomeAbout = () => {
           Online Crackers in Sivakasi
         </h2>
         
-        <p className="text-base md:text-lg font-body leading-relaxed text-gray-700">
-          <span className="font-bold text-brand">Tamil Mani Traders</span> is a leading Online Crackers shop in Sivakasi. We are top Online Crackers in Sivakasi for more than 25 years of experience in Online crackers in sivakasi. With our Top-Rated Customer service, good packaging and proper delivery of online crackers we now have more than 25,000+ happy customers.
-        </p>
+        <div className="text-base md:text-lg font-body leading-relaxed text-gray-700 space-y-4 text-left md:text-center">
+          <p className="font-bold text-brand uppercase tracking-wide">
+            Tamilmani Traders - Premium Sivakasi Crackers
+          </p>
+          <p>
+            We are a leading wholesale supplier of authentic <strong>Sivakasi crackers</strong> and premium fireworks, serving customers across Tamil Nadu and South India. With over 5+ years of trusted experience in the Sivakasi wholesale market, <strong>Tamilmani Traders</strong> provides high-quality, safe, and ISI-certified products at competitive wholesale prices.
+          </p>
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-left max-w-md mx-auto mt-4">
+            <h3 className="font-bold text-gray-900 mb-2">Our Services:</h3>
+            <ul className="list-disc pl-5 space-y-1 text-gray-700 text-sm md:text-base">
+              <li>Bulk Fireworks Supply for Corporate & Retail</li>
+              <li>Exclusive Family & Kids Combo Packs</li>
+              <li>Safe & Secure Doorstep Delivery across South India</li>
+            </ul>
+          </div>
+          <p className="font-semibold text-brand mt-4">
+            Contact us today for bulk orders and wholesale enquiries to make your celebrations brighter!
+          </p>
+        </div>
 
         <div className="mt-8">
           <button className="bg-brand text-white px-8 py-3 rounded-full font-bold hover:bg-footer hover:text-brand transition-colors duration-300 shadow-lg">

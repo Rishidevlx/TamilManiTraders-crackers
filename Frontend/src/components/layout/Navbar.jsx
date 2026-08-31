@@ -94,17 +94,21 @@ const Navbar = () => {
     { name: 'Shop', path: '/shop' },
     { name: 'About Us', path: '/about' },
     { name: 'Contact', path: '/contact' },
+    { name: 'Blog', path: '/blog' },
   ];
 
   return (
     <>
       <div className="relative w-full z-50 flex flex-col font-body shadow-md bg-white">
 
-        {/* Header 1 (Top Bar - Red) */}
-        <div className="bg-brand text-white text-xs md:text-sm py-3 px-4 hidden md:flex justify-center w-full">
+        {/* Header 1 (Top Bar - Matches Bottom Bar) */}
+        <div className="bg-footer text-black text-xs md:text-sm py-3 px-4 hidden md:flex justify-center w-full shadow-sm">
           <div className="max-w-7xl mx-auto w-full flex justify-between items-center">
-            <div className="font-bold tracking-wider uppercase">Tamil Mani Traders</div>
-            <div className="hidden lg:block text-white/90 text-xs text-center leading-relaxed whitespace-pre-line max-w-md">
+            <div className="flex flex-col">
+              <span className="font-bold tracking-wider uppercase">Tamil Mani Traders</span>
+              <span className="text-[10px] md:text-xs font-bold text-red-700 mt-0.5">ஸ்ரீ குருந்துடையார் சாஸ்தா அய்யனார் துணை</span>
+            </div>
+            <div className="hidden lg:block text-black/90 font-medium text-xs text-center leading-relaxed whitespace-pre-line max-w-md">
               {contactDetails.address}
             </div>
             <div className="flex items-center gap-4 text-xs font-semibold">
@@ -148,10 +152,12 @@ const Navbar = () => {
                     <div className="max-h-80 overflow-y-auto">
                       {searchResults.length > 0 ? (
                         <div className="py-2">
-                          {searchResults.map(product => (
+                          {searchResults.map(product => {
+                            const slugify = (text) => text ? text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '') : '';
+                            return (
                             <Link
                               key={product.id}
-                              to={`/product/${product.id}`}
+                              to={`/product/${slugify(product.name)}`}
                               onClick={() => setSearchQuery('')}
                               className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
                             >
@@ -165,7 +171,8 @@ const Navbar = () => {
                                 <p className="text-xs text-brand font-semibold">₹{Number(product.price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                               </div>
                             </Link>
-                          ))}
+                            );
+                          })}
                         </div>
                       ) : (
                         <div className="p-4 text-center text-sm text-gray-500 font-medium">
@@ -241,7 +248,7 @@ const Navbar = () => {
 
             {/* Right Button */}
             <div className="flex-1 flex justify-end">
-              <a href={pricelistUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-bold text-sm bg-black text-white px-5 py-2 rounded-full hover:bg-brand transition-colors shadow-sm">
+              <a href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/products/pricelist/download`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-bold text-sm bg-black text-white px-5 py-2 rounded-full hover:bg-brand transition-colors shadow-sm">
                 <FaDownload /> Download Pricelist
               </a>
             </div>
@@ -276,7 +283,7 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            <a href={pricelistUrl} target="_blank" rel="noopener noreferrer" className="block px-4 py-3 rounded-lg text-base font-semibold uppercase text-brand hover:bg-gray-50 flex items-center gap-2 mt-2 border border-brand">
+            <a href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/products/pricelist/download`} target="_blank" rel="noopener noreferrer" className="block px-4 py-3 rounded-lg text-base font-semibold uppercase text-brand hover:bg-gray-50 flex items-center gap-2 mt-2 border border-brand">
               <FaDownload /> Download Pricelist
             </a>
           </div>

@@ -29,6 +29,16 @@ const fetchImage = (url) => {
 const generateInvoice = async (enquiryData) => {
   return new Promise(async (resolve, reject) => {
     try {
+      // Pre-fetch logo image
+      let logoBuffer = null;
+      if (enquiryData.logo_url && enquiryData.logo_url.startsWith('http')) {
+        try {
+          logoBuffer = await fetchImage(enquiryData.logo_url);
+        } catch (e) {
+          console.error("Failed to load logo image");
+        }
+      }
+
       // Pre-fetch images
       const itemsWithImages = [];
       if (enquiryData.cart_data && Array.isArray(enquiryData.cart_data)) {
@@ -73,22 +83,25 @@ const generateInvoice = async (enquiryData) => {
         uploadStream.end(pdfData);
       });
 
-      const logoPath = path.join(__dirname, '../../Frontend/public/Logo/logo-removebg-preview.png');
-      const hasLogo = fs.existsSync(logoPath);
+      // Use logoBuffer if available, otherwise fallback to local logo
+      const localLogoPath = path.join(__dirname, '../../Frontend/public/Logo/logo-removebg-preview.png');
+      const hasLocalLogo = fs.existsSync(localLogoPath);
+      
+      const logoToUse = logoBuffer || (hasLocalLogo ? localLogoPath : null);
 
       // --- Draw PDF Content ---
 
       // Add Watermark
-      if (hasLogo) {
+      if (logoToUse) {
         doc.save();
         doc.opacity(0.08);
-        doc.image(logoPath, 150, 300, { width: 300 });
+        doc.image(logoToUse, 150, 300, { width: 300 });
         doc.restore();
       }
       
       // Top Left: Logo / Brand Name
-      if (hasLogo) {
-         doc.image(logoPath, 50, 40, { height: 90 }); // Increased size
+      if (logoToUse) {
+         doc.image(logoToUse, 50, 40, { height: 90 }); // Increased size
       } else {
          doc.fontSize(24).fillColor('#C70E17').text('TAMIL MANI TRADERS', 50, 50, { bold: true });
       }
@@ -98,6 +111,9 @@ const generateInvoice = async (enquiryData) => {
       // Top Right: INVOICE details
       doc.fontSize(10).fillColor('#000000').text(`INVOICE NO: ${enquiryData.enquiry_no}`, 350, 50, { align: 'right', width: 200 });
       doc.text(`DATE: ${new Date().toLocaleDateString('en-IN')}`, 350, 65, { align: 'right', width: 200 });
+      if (enquiryData.gst_number) {
+        doc.text(`GST NO: ${enquiryData.gst_number.toUpperCase()}`, 350, 80, { align: 'right', width: 200 });
+      }
 
       // ISSUED TO:
       doc.moveDown(5);
@@ -204,10 +220,18 @@ const generateInvoice = async (enquiryData) => {
       doc.moveDown(5);
 
       // Footer Shop Details
+      const contactPhone = enquiryData.contact_details?.phone || '+91 8248834928';
+      const contactEmail = enquiryData.contact_details?.email || 'info@tamilmanitraders.com';
+      let contactAddress = enquiryData.contact_details?.address || 'Sivakasi, Tamil Nadu, India';
+      contactAddress = contactAddress.replace(/\n/g, ', ');
+
       doc.fontSize(12).font("Helvetica-Bold").fillColor('#C70E17').text('TAMIL MANI TRADERS (From)', { align: 'right' });
-      doc.fontSize(9).font("Helvetica").fillColor('#333333').text('Phone: +91 8248834928', { align: 'right' }); 
-      doc.text('Email: info@tamilmanitraders.com', { align: 'right' });
-      doc.text('Address: Sivakasi, Tamil Nadu, India', { align: 'right' });
+      doc.fontSize(9).font("Helvetica").fillColor('#333333').text(`Phone: ${contactPhone}`, { align: 'right' }); 
+      doc.text(`Email: ${contactEmail}`, { align: 'right' });
+      doc.text(`Address: ${contactAddress}`, { align: 'right' });
+      if (enquiryData.gst_number) {
+        doc.text(`GST No: ${enquiryData.gst_number.toUpperCase()}`, { align: 'right' });
+      }
 
       // Add Borders to all pages
       const pages = doc.bufferedPageRange();
