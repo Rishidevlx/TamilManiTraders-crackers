@@ -11,6 +11,7 @@ const invalidateCaches = async () => {
   if (redis) {
     try {
       await redis.del('products:all');
+      await redis.del('products:all_admin');
       await redis.del('products:top-selling');
       await redis.del('pricelist:pdf');
     } catch (err) {
@@ -459,9 +460,12 @@ router.get('/pricelist/download', async (req, res) => {
 // @access  Public
 router.get('/', async (req, res) => {
   try {
+    const isAdmin = req.query.admin === 'true';
+    const cacheKey = isAdmin ? 'products:all_admin' : 'products:all';
+
     if (redis) {
       try {
-        const cachedProducts = await redis.get('products:all');
+        const cachedProducts = await redis.get(cacheKey);
         if (cachedProducts) {
           return res.json({ success: true, data: cachedProducts });
         }
@@ -470,15 +474,14 @@ router.get('/', async (req, res) => {
       }
     }
 
-    const [rows] = await db.query(`
-      SELECT p.*, c.name as category_name 
-      FROM products p 
-      LEFT JOIN categories c ON p.category_id = c.id
-      ORDER BY p.created_at DESC
-    `);
+    const query = isAdmin 
+      ? `SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.created_at DESC`
+      : `SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 'active' ORDER BY p.created_at DESC`;
+
+    const [rows] = await db.query(query);
     
     if (redis) {
-      await redis.set('products:all', rows);
+      await redis.set(cacheKey, rows);
     }
     
     res.json({ success: true, data: rows });
@@ -508,7 +511,7 @@ router.get('/top-selling', async (req, res) => {
       SELECT p.*, c.name as category_name 
       FROM products p 
       LEFT JOIN categories c ON p.category_id = c.id
-      WHERE p.is_top_selling = TRUE
+      WHERE p.is_top_selling = TRUE AND p.status = 'active'
       ORDER BY p.top_selling_order ASC
     `);
     

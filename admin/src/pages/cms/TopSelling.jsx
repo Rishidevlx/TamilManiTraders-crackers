@@ -73,7 +73,8 @@ const TopSelling = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch(import.meta.env.VITE_API_URL + '/api/products');
+      setLoading(true);
+      const response = await fetch(import.meta.env.VITE_API_URL + '/api/products?admin=true');
       const data = await response.json();
       if (data.success) {
         setAllProducts(data.data);

@@ -83,8 +83,8 @@ const Footer = () => {
             <li><Link to="/shop" className="hover:text-brand hover:translate-x-1 inline-block transition-transform duration-300">Shop</Link></li>
             <li><Link to="/about" className="hover:text-brand hover:translate-x-1 inline-block transition-transform duration-300">About Us</Link></li>
             <li><Link to="/contact" className="hover:text-brand hover:translate-x-1 inline-block transition-transform duration-300">Contact Us</Link></li>
-            <li><Link to="/wishlist" className="hover:text-brand hover:translate-x-1 inline-block transition-transform duration-300">Wishlist</Link></li>
-            <li><Link to="/cart" className="hover:text-brand hover:translate-x-1 inline-block transition-transform duration-300">Cart</Link></li>
+            <li><Link to="/privacy-policy" className="hover:text-brand hover:translate-x-1 inline-block transition-transform duration-300">Privacy Policy</Link></li>
+            <li><Link to="/terms-conditions" className="hover:text-brand hover:translate-x-1 inline-block transition-transform duration-300">Terms & Conditions</Link></li>
           </ul>
         </div>
 

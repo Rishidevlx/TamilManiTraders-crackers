@@ -43,7 +43,7 @@ const ProductOffers = () => {
     setIsLoading(true);
     try {
       const [prodRes, catRes] = await Promise.all([
-        fetch(import.meta.env.VITE_API_URL + '/api/products').then(res => res.json()),
+        fetch(import.meta.env.VITE_API_URL + '/api/products?admin=true').then(res => res.json()),
         fetch(import.meta.env.VITE_API_URL + '/api/categories').then(res => res.json())
       ]);
       setProducts(prodRes.data);

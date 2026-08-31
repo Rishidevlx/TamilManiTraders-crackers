@@ -74,7 +74,7 @@ const AllProducts = () => {
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(import.meta.env.VITE_API_URL + '/api/products');
+      const response = await fetch(import.meta.env.VITE_API_URL + '/api/products?admin=true');
       const data = await response.json();
       if (data.success) {
         setProducts(data.data);
