@@ -16,8 +16,6 @@ import { Fireworks } from '@fireworks-js/react';
 
 
 import About from './pages/About';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsConditions from './pages/TermsConditions';
 import Contact from './pages/Contact';
