@@ -28,7 +28,7 @@ const BlogPost = () => {
         title={post.title}
         description={post.excerpt}
         keywords={post.keywords}
-        url={`https://tamilmanitraders.com/blog/${post.slug}`}
+        url={`https://tamilmanitraders.in/blog/${post.slug}`}
         image={post.image}
         type="article"
         structuredData={{
@@ -40,7 +40,7 @@ const BlogPost = () => {
           author: { '@type': 'Organization', name: 'Tamil Mani Traders' },
           publisher: { '@type': 'Organization', name: 'Tamil Mani Traders' },
           datePublished: post.date,
-          url: `https://tamilmanitraders.com/blog/${post.slug}`,
+          url: `https://tamilmanitraders.in/blog/${post.slug}`,
         }}
       />
 

@@ -55,7 +55,7 @@ const Hero = () => {
           >
             <img 
               src={img} 
-              alt={`Hero Banner ${index + 1}`} 
+              alt={`Tamil Mani Traders Sivakasi Crackers Wholesale - Offer Banner ${index + 1}`} 
               className="w-full h-full object-contain md:object-cover object-center"
             />
           </div>

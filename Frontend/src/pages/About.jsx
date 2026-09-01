@@ -11,7 +11,7 @@ const About = () => {
         title="About Us | Tamil Mani Traders - Sivakasi Crackers"
         description="Learn about Tamil Mani Traders, the most trusted crackers shop in Sivakasi since 2000. Discover our core values, safe packaging, and commitment to quality fireworks."
         keywords="about tamil mani traders, crackers shop in sivakasi, sivakasi fireworks company, online crackers shopping sivakasi, subhas chandra bose sivakasi"
-        url="https://tamilmanitraders.com/about"
+        url="https://tamilmanitraders.in/about"
       />
       
       {/* 1. Banner Section */}

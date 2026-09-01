@@ -8,7 +8,7 @@ const NotFound = () => {
       <SEO 
         title="Page Not Found | Tamil Mani Traders" 
         description="The page you are looking for does not exist. Return to the Tamil Mani Traders homepage to shop for the best Sivakasi fireworks."
-        url="https://tamilmanitraders.com/404"
+        url="https://tamilmanitraders.in/404"
       />
       <h1 className="text-8xl md:text-9xl font-heading font-bold text-brand drop-shadow-md mb-4">404</h1>
       <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 uppercase tracking-wider">Oops! Page Not Found</h2>

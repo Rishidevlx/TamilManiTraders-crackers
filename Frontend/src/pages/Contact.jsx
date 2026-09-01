@@ -29,7 +29,7 @@ const Contact = () => {
         title="Contact Us | Tamil Mani Traders Sivakasi"
         description="Get in touch with Tamil Mani Traders for wholesale crackers orders, enquiries, and bulk bookings. Visit our shop in Sivakasi or contact us online."
         keywords="contact tamil mani traders, crackers shop phone number, sivakasi fireworks contact, buy crackers wholesale contact"
-        url="https://tamilmanitraders.com/contact"
+        url="https://tamilmanitraders.in/contact"
       />
       
       {/* 1. Banner Section */}

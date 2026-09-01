@@ -117,7 +117,7 @@ const ProductDetails = () => {
         title={`${product.name} | Buy Online at Tamil Mani Traders`}
         description={product.description[0] || `Buy ${product.name} online at wholesale prices from Tamil Mani Traders. Premium Sivakasi crackers with safe delivery.`}
         keywords={`${product.name}, ${product.category}, buy ${product.name}, sivakasi crackers online, fireworks`}
-        url={`https://tamilmanitraders.com/product/${id}`}
+        url={`https://tamilmanitraders.in/product/${id}`}
         image={product.image}
         type="product"
         structuredData={{
@@ -132,7 +132,7 @@ const ProductDetails = () => {
           },
           "offers": {
             "@type": "Offer",
-            "url": `https://tamilmanitraders.com/product/${id}`,
+            "url": `https://tamilmanitraders.in/product/${id}`,
             "priceCurrency": "INR",
             "price": product.price,
             "availability": "https://schema.org/InStock",
@@ -141,6 +141,12 @@ const ProductDetails = () => {
               "name": "Tamil Mani Traders"
             }
           }
+        }}
+        twitterData={{
+          label1: "Price",
+          data1: `₹${product.price}`,
+          label2: "Category",
+          data2: product.category || "Fireworks"
         }}
       />
       <div className="max-w-7xl mx-auto px-5 md:px-12">

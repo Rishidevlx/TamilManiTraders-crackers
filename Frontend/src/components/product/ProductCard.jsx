@@ -65,7 +65,7 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
       >
         <img 
           src={product.image || 'https://via.placeholder.com/200'} 
-          alt={product.name} 
+          alt={`${product.name} - Sivakasi Crackers Wholesale | Tamil Mani Traders`} 
           loading="lazy"
           className="max-h-full object-contain group-hover:scale-110 transition-transform duration-500 ease-in-out drop-shadow-md"
         />

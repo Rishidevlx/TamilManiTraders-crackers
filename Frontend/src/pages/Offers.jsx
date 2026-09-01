@@ -103,7 +103,7 @@ const Offers = () => {
         title="Exclusive Diwali Crackers Offers | Tamil Mani Traders"
         description="Grab the best deals and combo offers on Sivakasi crackers. Special discounts on bulk orders and family packs for a grand Diwali celebration."
         keywords="crackers combo offers, diwali crackers discount, sivakasi crackers offers, cheap crackers online, buy fireworks combo"
-        url="https://tamilmanitraders.com/offers"
+        url="https://tamilmanitraders.in/offers"
       />
       <ShopBanner />
       

@@ -129,7 +129,7 @@ const Shop = () => {
         title="Shop Sivakasi Crackers | Tamil Mani Traders"
         description="Browse our wide collection of premium Sivakasi crackers. Get the best wholesale prices on sparklers, atom bombs, flower pots, and family combo packs."
         keywords="sivakasi crackers price list, buy crackers online, wholesale fireworks, crackers shop, tamil mani traders shop"
-        url="https://tamilmanitraders.com/shop"
+        url="https://tamilmanitraders.in/shop"
       />
       <ShopBanner />
       

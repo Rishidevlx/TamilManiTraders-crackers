@@ -18,7 +18,7 @@ const Blog = () => {
         title="Crackers Blog - Diwali Tips & Guide"
         description="Read expert guides on diwali crackers safety, ordering tips, green crackers, and more. Tamil Mani Traders blog - your complete Sivakasi crackers knowledge hub."
         keywords="diwali crackers online, sivakasi crackers, crackers safety tips, green crackers, tamil mani traders blog"
-        url="https://tamilmanitraders.com/blog"
+        url="https://tamilmanitraders.in/blog"
       />
 
       {/* Blog Banner */}
