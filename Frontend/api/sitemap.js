@@ -12,7 +12,6 @@ export default async function handler(req, res) {
     const staticPages = [
       '',
       '/shop',
-      '/offers',
       '/about',
       '/contact',
       '/blog',
