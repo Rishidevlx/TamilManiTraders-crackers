@@ -17,25 +17,39 @@ const Home = () => {
         url="https://tamilmanitraders.in/"
         structuredData={{
           "@context": "https://schema.org",
-          "@type": "LocalBusiness",
-          "name": "Tamil Mani Traders",
-          "description": "Premium quality Sivakasi crackers shop offering wholesale prices and online delivery.",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "S.No. 456/2C1B, D.No. 2/266, ALANGULAM",
-            "addressLocality": "Vembakottai (Tk), Virudhunagar (Dt)",
-            "addressRegion": "Tamil Nadu",
-            "postalCode": "626131",
-            "addressCountry": "IN"
-          },
-          "telephone": "+919994703605",
-          "url": "https://tamilmanitraders.in",
-          "areaServed": [
-            "Sivakasi",
-            "Tamil Nadu",
-            "South India",
-            "North India",
-            "All Over India"
+          "@graph": [
+            {
+              "@type": "LocalBusiness",
+              "name": "Tamil Mani Traders",
+              "description": "Premium quality Sivakasi crackers shop offering wholesale prices and online delivery.",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "S.No. 456/2C1B, D.No. 2/266, ALANGULAM",
+                "addressLocality": "Vembakottai (Tk), Virudhunagar (Dt)",
+                "addressRegion": "Tamil Nadu",
+                "postalCode": "626131",
+                "addressCountry": "IN"
+              },
+              "telephone": "+919994703605",
+              "url": "https://tamilmanitraders.in",
+              "areaServed": [
+                "Sivakasi",
+                "Tamil Nadu",
+                "South India",
+                "North India",
+                "All Over India"
+              ]
+            },
+            {
+              "@type": "WebSite",
+              "name": "Tamil Mani Traders",
+              "url": "https://tamilmanitraders.in/",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://tamilmanitraders.in/shop?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            }
           ]
         }}
       />
