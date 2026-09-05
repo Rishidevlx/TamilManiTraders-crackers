@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import SEO from '../components/seo/SEO';
 import ShopBanner from '../components/shop/ShopBanner';
 import ShopSidebar from '../components/shop/ShopSidebar';
@@ -8,10 +9,12 @@ import ProductTable from '../components/product/ProductTable';
 import Pagination from '../components/common/Pagination';
 
 const Shop = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [categoriesList, setCategoriesList] = useState([]);
   const [products, setProducts] = useState([]);
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,16 +22,30 @@ const Shop = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+  // Sync category query parameter from URL (e.g., /shop?category=Morning%20crackers)
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      setSelectedCategories([categoryParam]);
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes, cmsRes] = await Promise.all([
+        const [productsRes, cmsRes, catRes] = await Promise.all([
           fetch(import.meta.env.VITE_API_URL + '/api/products'),
-          fetch(import.meta.env.VITE_API_URL + '/api/cms/home')
+          fetch(import.meta.env.VITE_API_URL + '/api/cms/home'),
+          fetch(import.meta.env.VITE_API_URL + '/api/categories')
         ]);
         
         const productsData = await productsRes.json();
         const cmsData = await cmsRes.json();
+        const catData = await catRes.json();
+
+        if (catData.success) {
+          setCategoriesList(catData.data || []);
+        }
 
         let initialSort = 'default';
         if (cmsData.success && cmsData.data.general_settings?.product_sort_order === 'recent') {
@@ -92,6 +109,24 @@ const Shop = () => {
     fetchData();
   }, []);
 
+  const expandedCategories = useMemo(() => {
+    if (selectedCategories.length === 0) return [];
+    const valid = new Set(selectedCategories.map(c => c.trim().toLowerCase()));
+    
+    categoriesList.forEach(cat => {
+      if (cat.name && valid.has(cat.name.trim().toLowerCase())) {
+        // Add all subcategories under this parent category
+        categoriesList
+          .filter(sub => sub.parent_id === cat.id)
+          .forEach(sub => {
+            if (sub.name) valid.add(sub.name.trim().toLowerCase());
+          });
+      }
+    });
+
+    return Array.from(valid);
+  }, [selectedCategories, categoriesList]);
+
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     
@@ -99,7 +134,10 @@ const Shop = () => {
     const max = maxPrice === '' ? Infinity : Number(maxPrice);
     const matchesPrice = product.price >= min && product.price <= max;
     
-    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
+    let matchesCategory = selectedCategories.length === 0;
+    if (!matchesCategory && product.category) {
+      matchesCategory = expandedCategories.includes(product.category.trim().toLowerCase());
+    }
 
     return matchesSearch && matchesPrice && matchesCategory;
   });

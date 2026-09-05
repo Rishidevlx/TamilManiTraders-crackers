@@ -23,6 +23,7 @@ import Offers from './pages/Offers';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import NotFound from './pages/NotFound';
+import PromoLoader from './components/common/PromoLoader.jsx';
 
 function App() {
   const [showFireworks, setShowFireworks] = useState(false);
@@ -30,7 +31,7 @@ function App() {
   useEffect(() => {
     const handleFireworks = () => {
       setShowFireworks(true);
-      setTimeout(() => setShowFireworks(false), 2500); // Hide after 2.5 seconds
+      setTimeout(() => setShowFireworks(false), 5000); // Fireworks canvas active for 5 seconds
     };
     window.addEventListener('trigger-fireworks', handleFireworks);
     return () => window.removeEventListener('trigger-fireworks', handleFireworks);
@@ -41,10 +42,13 @@ function App() {
       <Toaster position="top-center" />
       <ScrollToTop />
       
+      {/* Intro Bomb Blast Loader */}
+      <PromoLoader />
+
       {/* Global Fireworks Overlay */}
       {showFireworks && (
         <Fireworks
-          options={{ opacity: 0.5, particles: 100, intensity: 30 }}
+          options={{ opacity: 0.7, particles: 150, intensity: 45 }}
           style={{
             top: 0,
             left: 0,

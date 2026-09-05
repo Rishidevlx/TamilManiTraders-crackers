@@ -101,19 +101,28 @@ const Navbar = () => {
     <>
       <div className="relative w-full z-50 flex flex-col font-body shadow-md bg-white">
 
-        {/* Header 1 (Top Bar - Matches Bottom Bar) */}
-        <div className="bg-footer text-black text-xs md:text-sm py-3 px-4 hidden md:flex justify-center w-full shadow-sm">
-          <div className="max-w-7xl mx-auto w-full flex justify-between items-center">
-            <div className="flex flex-col">
-              <span className="font-bold tracking-wider uppercase">Tamil Mani Traders</span>
-              <span className="text-[10px] md:text-xs font-bold text-red-700 mt-0.5">ஸ்ரீ குருந்துடையார் சாஸ்தா அய்யனார் துணை</span>
+        {/* Header 1 (Top Bar - Dark Blue #001475) */}
+        <div className="bg-[#001475] text-white text-xs md:text-sm py-2.5 px-4 hidden md:flex justify-center w-full shadow-sm border-b border-white/10">
+          <div className="max-w-7xl mx-auto w-full flex justify-between items-center gap-4">
+            {/* Left: Contact Details */}
+            <div className="flex items-center gap-4 text-xs font-semibold text-white/90">
+              <div className="flex items-center gap-1.5 hover:text-white transition-colors">
+                <FaPhoneAlt className="text-yellow-400 text-xs" /> {contactDetails.phone}
+              </div>
+              <div className="flex items-center gap-1.5 hover:text-white transition-colors">
+                <FaEnvelope className="text-yellow-400 text-xs" /> {contactDetails.email}
+              </div>
             </div>
-            <div className="hidden lg:block text-black/90 font-medium text-xs text-center leading-relaxed whitespace-pre-line max-w-md">
+
+            {/* Center: Brand Name & God Name */}
+            <div className="flex flex-col items-center text-center">
+              <span className="text-[11px] md:text-xs font-bold text-yellow-300 mt-0.5">ஸ்ரீ குருந்துடையார் சாஸ்தா அய்யனார் துணை</span>
+              <span className="font-bold tracking-wider uppercase text-sm text-white">Tamil Mani Traders</span>
+            </div>
+
+            {/* Right: Address */}
+            <div className="hidden lg:block text-white/90 font-medium text-xs text-right leading-tight max-w-xs whitespace-pre-line">
               {contactDetails.address}
-            </div>
-            <div className="flex items-center gap-4 text-xs font-semibold">
-              <div className="flex items-center gap-1"><FaPhoneAlt /> {contactDetails.phone}</div>
-              <div className="flex items-center gap-1"><FaEnvelope /> {contactDetails.email}</div>
             </div>
           </div>
         </div>

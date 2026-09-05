@@ -73,7 +73,8 @@ const GeneralSettings = () => {
           favicon_url: data.data.general_settings.favicon_url || '',
           pricelist_url: data.data.general_settings.pricelist_url || '',
           currency_symbol: data.data.general_settings.currency_symbol || '₹',
-          gst_number: data.data.general_settings.gst_number || ''
+          gst_number: data.data.general_settings.gst_number || '',
+          is_promo_enabled: data.data.general_settings.is_promo_enabled !== false
         });
       }
     } catch (error) {
@@ -234,6 +235,39 @@ const GeneralSettings = () => {
                 />
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Promo Intro Screen Toggle Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">💥</span>
+              <h2 className="text-lg font-bold text-gray-800">Website Promo Loader Screen</h2>
+            </div>
+            <span className={`px-3 py-1 rounded-full text-xs font-bold ${settings.is_promo_enabled !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+              {settings.is_promo_enabled !== false ? 'ACTIVE' : 'INACTIVE'}
+            </span>
+          </div>
+          
+          <div className="p-6 flex items-center justify-between gap-6">
+            <div>
+              <h3 className="font-bold text-gray-800 text-base">Enable Bomb Blast Promo Screen</h3>
+              <p className="text-sm text-gray-500 mt-1 max-w-md">
+                When enabled, visitors will see the animated bomb fuse & blast intro screen on opening the website.
+              </p>
+            </div>
+
+            {/* Toggle Switch */}
+            <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
+              <input 
+                type="checkbox" 
+                checked={settings.is_promo_enabled !== false}
+                onChange={(e) => setSettings({ ...settings, is_promo_enabled: e.target.checked })}
+                className="sr-only peer"
+              />
+              <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-brand"></div>
+            </label>
           </div>
         </div>
 
